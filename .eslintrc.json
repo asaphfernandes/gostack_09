@@ -6,9 +6,7 @@
   },
   "extends": [
     "airbnb-base",
-    "plugin:@typescript-eslint/recommended",
-    "prettier/@typescript-eslint",
-    "plugin:prettier/recommended"
+    "plugin:@typescript-eslint/recommended"
   ],
   "globals": {
     "Atomics": "readonly",
@@ -19,7 +17,7 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "prettier"],
+  "plugins": ["@typescript-eslint"],
   "rules": {
     "@typescript-eslint/no-unused-vars": [
       "error",
@@ -35,7 +33,6 @@
       }
     ],
     "@typescript-eslint/camelcase": "off",
-    "prettier/prettier": "error",
     "class-methods-use-this": "off",
     "import/extensions": [
       "error",
