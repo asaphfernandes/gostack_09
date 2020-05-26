@@ -10,7 +10,7 @@ import {
 import OrdersProducts from '@modules/orders/infra/typeorm/entities/OrdersProducts';
 import ColumnNumericTransformer from '@shared/infra/typeorm/transfomers/ColumnNomericTransformer';
 
-@Entity('Products')
+@Entity('products')
 class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -21,7 +21,7 @@ class Product {
   @Column('numeric', { precision: 9, scale: 2, transformer: new ColumnNumericTransformer() })
   price: number;
 
-  @Column()
+  @Column('numeric')
   quantity: number;
 
   @OneToMany(() => OrdersProducts, (orderProduct) => orderProduct.product)

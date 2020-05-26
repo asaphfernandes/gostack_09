@@ -13,10 +13,20 @@ interface IRequest {
 
 @injectable()
 class CreateProductService {
-  constructor(private productsRepository: IProductsRepository) {}
+  constructor(
+    @inject('IProductsRepository')
+    private productsRepository: IProductsRepository,
+  ) { }
 
   public async execute({ name, price, quantity }: IRequest): Promise<Product> {
-    // TODO
+    const productWithSameName = await this.productsRepository.findByName(name);
+
+    if (productWithSameName) {
+      throw new AppError('the product\'s name  was previously registered.');
+    }
+
+    const product = await this.productsRepository.create({ name, price, quantity });
+    return product;
   }
 }
 

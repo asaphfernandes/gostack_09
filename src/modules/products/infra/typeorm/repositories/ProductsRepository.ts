@@ -5,10 +5,6 @@ import ICreateProductDTO from '@modules/products/dtos/ICreateProductDTO';
 import IUpdateProductsQuantityDTO from '@modules/products/dtos/IUpdateProductsQuantityDTO';
 import Product from '../entities/Product';
 
-interface IFindProducts {
-  id: string;
-}
-
 class ProductsRepository implements IProductsRepository {
   private ormRepository: Repository<Product>;
 
@@ -21,21 +17,26 @@ class ProductsRepository implements IProductsRepository {
     price,
     quantity,
   }: ICreateProductDTO): Promise<Product> {
-    // TODO
+    const product = this.ormRepository.create({ name, price, quantity });
+    await this.ormRepository.save(product);
+    return product;
   }
 
   public async findByName(name: string): Promise<Product | undefined> {
-    // TODO
+    return this.ormRepository.findOne({ where: { name } });
   }
 
-  public async findAllById(products: IFindProducts[]): Promise<Product[]> {
-    // TODO
+  public async findAllById(products: string[]): Promise<Product[]> {
+    return this.ormRepository.find({ where: { id: In(products) } });
   }
 
   public async updateQuantity(
     products: IUpdateProductsQuantityDTO[],
   ): Promise<Product[]> {
-    // TODO
+    const productIds = products.map((product) => product.id);
+    const dbProducts = await this.findAllById(productIds);
+    // TODO Atualizar quantidade
+    return dbProducts;
   }
 }
 
