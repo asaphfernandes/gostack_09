@@ -4,6 +4,7 @@ import IProductsRepository from '@modules/products/repositories/IProductsReposit
 import ICreateProductDTO from '@modules/products/dtos/ICreateProductDTO';
 import IUpdateProductsQuantityDTO from '@modules/products/dtos/IUpdateProductsQuantityDTO';
 import Product from '../entities/Product';
+import AppError from '@shared/errors/AppError';
 
 class ProductsRepository implements IProductsRepository {
   private ormRepository: Repository<Product>;
@@ -35,7 +36,17 @@ class ProductsRepository implements IProductsRepository {
   ): Promise<Product[]> {
     const productIds = products.map((product) => product.id);
     const dbProducts = await this.findAllById(productIds);
-    // TODO Atualizar quantidade
+
+    products.forEach(async (product) => {
+      const dbProduct = dbProducts.find((p) => p.id === product.id);
+
+      if (!dbProduct) {
+        throw new AppError('Update error', 500);
+      }
+
+      await this.ormRepository.update({ id: dbProduct.id }, product);
+    });
+
     return dbProducts;
   }
 }

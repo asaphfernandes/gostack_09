@@ -31,10 +31,10 @@ class OrdersProducts {
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
-  @Column('numeric', { precision: 9, scale: 2, transformer: new ColumnNumericTransformer() })
+  @Column('numeric', { precision: 9, scale: 2 })
   price: number;
 
-  @Column()
+  @Column('numeric', { transformer: new ColumnNumericTransformer() })
   quantity: number;
 
   @CreateDateColumn()

@@ -6,6 +6,7 @@ import IProductsRepository from '@modules/products/repositories/IProductsReposit
 import ICustomersRepository from '@modules/customers/repositories/ICustomersRepository';
 import Order from '../infra/typeorm/entities/Order';
 import IOrdersRepository from '../repositories/IOrdersRepository';
+import IUpdateProductsQuantityDTO from '@modules/products/dtos/IUpdateProductsQuantityDTO';
 
 interface IProduct {
   id: string;
@@ -37,12 +38,28 @@ class CreateProductService {
 
     const productIds = products.map((product) => product.id);
     const dbProducts = await this.productsRepository.findAllById(productIds);
-    const createProducts = dbProducts.map(({ id, price }) => {
-      const findProduct = products.find((product) => product.id === id);
-      const quantity = findProduct ? findProduct.quantity : 0;
-      return { product_id: id, price, quantity };
+    const updateProducts: IUpdateProductsQuantityDTO[] = [];
+    const createProducts = products.map((product) => {
+      const dbProduct = dbProducts.find((w) => w.id === product.id);
+
+      if (!dbProduct) {
+        throw new AppError('There are one or more products that were not found.');
+      }
+
+      if (dbProduct.quantity < product.quantity) {
+        throw new AppError('There are one or more products that quantity is greater than of stock.');
+      }
+
+      updateProducts.push({ id: dbProduct.id, quantity: dbProduct.quantity - product.quantity });
+
+      return {
+        product_id: dbProduct.id,
+        price: dbProduct.price,
+        quantity: product.quantity,
+      };
     });
 
+    this.productsRepository.updateQuantity(updateProducts);
     const order = this.ordersRepository.create({ customer, products: createProducts });
 
     return order;
